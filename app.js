@@ -2,253 +2,731 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
 
 const container = document.getElementById('app');
 
+//
+// SCENE
+//
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf0f0f0);
-scene.fog = new THREE.Fog(0xf0f0f0, 18, 60);
+scene.background = new THREE.Color(0x1b2230);
+scene.fog = new THREE.Fog(0x1b2230, 20, 70);
 
-const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 200);
-camera.position.set(0, 4.5, 11);
+const camera = new THREE.PerspectiveCamera(
+  50,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  200
+);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+camera.position.set(7, 5.2, 12);
+
+//
+// RENDERER
+//
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+
 container.appendChild(renderer.domElement);
 
-const ambient = new THREE.AmbientLight(0xffffff, 1.2);
-scene.add(ambient);
+//
+// LIGHTS
+//
+scene.add(new THREE.HemisphereLight(0xffe6c7, 0x182030, 1.8));
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
-dirLight.position.set(5, 10, 7);
-scene.add(dirLight);
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+keyLight.position.set(6, 10, 8);
+scene.add(keyLight);
 
-const rimLight = new THREE.DirectionalLight(0xffb347, 0.9);
-rimLight.position.set(-8, 6, -4);
-scene.add(rimLight);
+const warmLight = new THREE.DirectionalLight(0xffa64d, 1.1);
+warmLight.position.set(-7, 6, 2);
+scene.add(warmLight);
 
-const groundGroup = new THREE.Group();
-scene.add(groundGroup);
-
-const laneMaterial = new THREE.MeshStandardMaterial({
-  color: 0x171717,
-  roughness: 0.9,
-  metalness: 0.1,
+//
+// MATERIALS
+//
+const skinMat = new THREE.MeshStandardMaterial({
+  color: 0xc98f68,
+  roughness: 0.85
 });
 
-const glowMaterial = new THREE.MeshStandardMaterial({
-  color: 0x8b1f1f,
-  emissive: 0x3b0b0b,
-  metalness: 0.2,
-  roughness: 0.7,
+const creamMat = new THREE.MeshStandardMaterial({
+  color: 0xf2dfb5,
+  roughness: 0.9
 });
 
-for (let i = 0; i < 90; i++) {
-  const lane = new THREE.Mesh(new THREE.BoxGeometry(18, 0.35, 4), laneMaterial);
-  lane.position.set(0, -0.7, -i * 8);
-  groundGroup.add(lane);
+const redMat = new THREE.MeshStandardMaterial({
+  color: 0x9e2028,
+  roughness: 0.82
+});
 
-  const strip = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.02, 0.5), glowMaterial);
-  strip.position.set(0, -0.3, -i * 8);
-  groundGroup.add(strip);
-}
+const blueMat = new THREE.MeshStandardMaterial({
+  color: 0x173d79,
+  roughness: 0.8
+});
 
+const brownMat = new THREE.MeshStandardMaterial({
+  color: 0x5a341e,
+  roughness: 0.9
+});
+
+const bronzeMat = new THREE.MeshStandardMaterial({
+  color: 0x9f7040,
+  metalness: 0.65,
+  roughness: 0.35
+});
+
+const darkMat = new THREE.MeshStandardMaterial({
+  color: 0x221a17,
+  roughness: 0.9
+});
+
+const goldMat = new THREE.MeshStandardMaterial({
+  color: 0xc59b4c,
+  metalness: 0.75,
+  roughness: 0.25
+});
+
+const eyeMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  roughness: 0.4
+});
+
+const pupilMat = new THREE.MeshStandardMaterial({
+  color: 0x151515,
+  roughness: 0.5
+});
+
+//
+// CHARACTER
+//
 const character = new THREE.Group();
 scene.add(character);
 
-const skullMat = new THREE.MeshStandardMaterial({
-  color: 0xe5dcc5,
-  roughness: 0.75,
-  metalness: 0.12,
-});
-
-const boneMat = new THREE.MeshStandardMaterial({
-  color: 0xf1e3bf,
-  roughness: 0.8,
-  metalness: 0.08,
-});
-
-const suitMat = new THREE.MeshStandardMaterial({
-  color: 0x8d0d10,
-  roughness: 0.8,
-  metalness: 0.18,
-});
-
-const tieMat = new THREE.MeshStandardMaterial({
-  color: 0x4d0a0a,
-  roughness: 0.5,
-  metalness: 0.1,
-});
-
-const shirtMat = new THREE.MeshStandardMaterial({
-  color: 0xf6f4f0,
-  roughness: 0.9,
-  metalness: 0.04,
-});
-
-const shoeMat = new THREE.MeshStandardMaterial({
-  color: 0x331a0d,
-  roughness: 0.85,
-  metalness: 0.08,
-});
-
-const head = new THREE.Mesh(new THREE.SphereGeometry(1.34, 48, 48), skullMat);
-head.scale.set(1.15, 1.22, 1.05);
-head.position.y = 5.8;
-character.add(head);
-
-const jaw = new THREE.Mesh(new THREE.SphereGeometry(1.02, 36, 36), boneMat);
-jaw.scale.set(1.1, 0.5, 1.1);
-jaw.position.set(0, 4.65, 0.1);
-character.add(jaw);
-
-const eyeGeo = new THREE.SphereGeometry(0.18, 18, 18);
-const eyeMat = new THREE.MeshStandardMaterial({
-  color: 0xff8d00,
-  emissive: 0xff5d00,
-  emissiveIntensity: 1.3,
-  roughness: 0.5,
-});
-
-const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-leftEye.position.set(-0.42, 6.05, 1.1);
-const rightEye = leftEye.clone();
-rightEye.position.x = 0.42;
-character.add(leftEye, rightEye);
-
-const nose = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.8, 20), boneMat);
-nose.rotation.x = Math.PI / 2;
-nose.position.set(0, 5.3, 1.15);
-character.add(nose);
-
-const torso = new THREE.Mesh(new THREE.CapsuleGeometry(1.9, 4.4, 8, 20), suitMat);
-torso.position.y = 2.1;
-character.add(torso);
-
-const shirt = new THREE.Mesh(new THREE.BoxGeometry(1.75, 3.6, 1.8), shirtMat);
-shirt.position.set(0, 2.15, 0.8);
-character.add(shirt);
-
-const tie = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.0, 20), tieMat);
-tie.rotation.x = Math.PI / 2;
-tie.position.set(0, 1.8, 1.28);
-character.add(tie);
-
-const abdomen = new THREE.Mesh(new THREE.SphereGeometry(1.7, 30, 30), suitMat);
-abdomen.scale.set(1.3, 1.05, 1.1);
-abdomen.position.set(0, 0.1, 0.15);
-character.add(abdomen);
-
-const leftArm = new THREE.Group();
-const leftUpperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.55, 2.3, 8, 18), suitMat);
-leftUpperArm.rotation.z = 0.4;
-leftUpperArm.position.set(-2.3, 2.8, 0.1);
-leftArm.add(leftUpperArm);
-
-const leftForearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.52, 2.6, 8, 18), boneMat);
-leftForearm.rotation.z = 0.2;
-leftForearm.position.set(-3.1, 0.9, 0.2);
-leftArm.add(leftForearm);
-
-const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.48, 16, 16), boneMat);
-leftHand.position.set(-3.4, -0.5, 0.3);
-leftArm.add(leftHand);
-character.add(leftArm);
-
-const rightArm = leftArm.clone();
-rightArm.position.x = 0;
-rightArm.scale.x = -1;
-rightArm.position.z = 0;
-character.add(rightArm);
+//
+// LOWER BODY
+//
+const legs = new THREE.Group();
+character.add(legs);
 
 const leftLeg = new THREE.Group();
-const leftThigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.72, 3.5, 8, 18), suitMat);
-leftThigh.position.set(-0.8, -2.6, 0.1);
+const rightLeg = new THREE.Group();
+
+leftLeg.position.x = -0.72;
+rightLeg.position.x = 0.72;
+
+legs.add(leftLeg, rightLeg);
+
+const thighGeo = new THREE.CapsuleGeometry(
+  0.46,
+  1.75,
+  6,
+  12
+);
+
+const shinGeo = new THREE.CapsuleGeometry(
+  0.39,
+  1.55,
+  6,
+  12
+);
+
+const leftThigh = new THREE.Mesh(thighGeo, blueMat);
+leftThigh.position.y = -2.0;
+
+const rightThigh = new THREE.Mesh(thighGeo, blueMat);
+rightThigh.position.y = -2.0;
+
 leftLeg.add(leftThigh);
+rightLeg.add(rightThigh);
 
-const leftCalf = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 3.8, 8, 18), suitMat);
-leftCalf.position.set(-0.85, -5.7, 0.2);
-leftLeg.add(leftCalf);
+const leftShin = new THREE.Mesh(shinGeo, creamMat);
+leftShin.position.y = -3.6;
 
-const leftFoot = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.7, 2.2), shoeMat);
-leftFoot.position.set(-0.9, -8.15, 0.55);
-leftLeg.add(leftFoot);
-character.add(leftLeg);
+const rightShin = new THREE.Mesh(shinGeo, creamMat);
+rightShin.position.y = -3.6;
 
-const rightLeg = leftLeg.clone();
-rightLeg.position.x = 1.6;
-rightLeg.scale.x = -1;
-character.add(rightLeg);
+leftLeg.add(leftShin);
+rightLeg.add(rightShin);
 
-const shoulders = new THREE.Mesh(new THREE.SphereGeometry(1.7, 32, 32), suitMat);
-shoulders.scale.set(1.2, 0.7, 1.1);
-shoulders.position.set(0, 3.9, 0.1);
+//
+// BOOTS
+//
+const bootGeo = new THREE.BoxGeometry(
+  0.9,
+  0.65,
+  1.7
+);
+
+const leftBoot = new THREE.Mesh(bootGeo, brownMat);
+leftBoot.position.set(0, -4.7, 0.32);
+
+const rightBoot = new THREE.Mesh(bootGeo, brownMat);
+rightBoot.position.set(0, -4.7, 0.32);
+
+leftLeg.add(leftBoot);
+rightLeg.add(rightBoot);
+
+//
+// TUNIC
+//
+const torso = new THREE.Group();
+torso.position.y = 0.2;
+character.add(torso);
+
+const tunic = new THREE.Mesh(
+  new THREE.CapsuleGeometry(
+    1.35,
+    2.45,
+    8,
+    16
+  ),
+  redMat
+);
+
+tunic.scale.set(1.0, 1.0, 0.7);
+tunic.position.y = -0.2;
+torso.add(tunic);
+
+//
+// CHEST ARMOR
+//
+const chestArmor = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    1.75,
+    1.45,
+    0.34
+  ),
+  bronzeMat
+);
+
+chestArmor.position.set(0, 0.45, 0.83);
+chestArmor.rotation.x = -0.05;
+torso.add(chestArmor);
+
+//
+// ARMOR CENTER STRAP
+//
+const centerStrap = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    0.25,
+    1.5,
+    0.18
+  ),
+  goldMat
+);
+
+centerStrap.position.set(0, 0.45, 1.04);
+torso.add(centerStrap);
+
+//
+// BELT
+//
+const belt = new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    1.18,
+    1.18,
+    0.28,
+    20
+  ),
+  brownMat
+);
+
+belt.rotation.z = Math.PI / 2;
+belt.position.y = -1.05;
+torso.add(belt);
+
+const beltBuckle = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    0.32,
+    0.32,
+    0.18
+  ),
+  goldMat
+);
+
+beltBuckle.position.set(0, -1.05, 1.12);
+torso.add(beltBuckle);
+
+//
+// NECK
+//
+const neck = new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    0.4,
+    0.44,
+    0.55,
+    12
+  ),
+  skinMat
+);
+
+neck.position.y = 2.1;
+character.add(neck);
+
+//
+// HEAD
+//
+const head = new THREE.Mesh(
+  new THREE.SphereGeometry(
+    1.05,
+    24,
+    16
+  ),
+  skinMat
+);
+
+head.scale.set(0.95, 1.08, 0.88);
+head.position.y = 3.45;
+character.add(head);
+
+//
+// EARS
+//
+const earGeo = new THREE.SphereGeometry(
+  0.2,
+  12,
+  8
+);
+
+const leftEar = new THREE.Mesh(earGeo, skinMat);
+leftEar.position.set(-1.0, 3.45, 0);
+
+const rightEar = new THREE.Mesh(earGeo, skinMat);
+rightEar.position.set(1.0, 3.45, 0);
+
+character.add(leftEar, rightEar);
+
+//
+// EYES
+//
+const eyeGeo = new THREE.SphereGeometry(
+  0.16,
+  12,
+  10
+);
+
+const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+leftEye.position.set(-0.35, 3.65, 0.86);
+
+const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+rightEye.position.set(0.35, 3.65, 0.86);
+
+character.add(leftEye, rightEye);
+
+const pupilGeo = new THREE.SphereGeometry(
+  0.075,
+  10,
+  8
+);
+
+const leftPupil = new THREE.Mesh(
+  pupilGeo,
+  pupilMat
+);
+
+leftPupil.position.set(
+  -0.35,
+  3.65,
+  0.98
+);
+
+const rightPupil = new THREE.Mesh(
+  pupilGeo,
+  pupilMat
+);
+
+rightPupil.position.set(
+  0.35,
+  3.65,
+  0.98
+);
+
+character.add(leftPupil, rightPupil);
+
+//
+// NOSE
+//
+const nose = new THREE.Mesh(
+  new THREE.ConeGeometry(
+    0.12,
+    0.42,
+    10
+  ),
+  skinMat
+);
+
+nose.rotation.x = Math.PI / 2;
+nose.position.set(0, 3.42, 1.0);
+
+character.add(nose);
+
+//
+// MOUTH
+//
+const mouth = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    0.48,
+    0.08,
+    0.04
+  ),
+  darkMat
+);
+
+mouth.position.set(0, 3.05, 0.96);
+character.add(mouth);
+
+//
+// HELMET
+//
+const helmet = new THREE.Group();
+helmet.position.y = 4.15;
+character.add(helmet);
+
+const helmetTop = new THREE.Mesh(
+  new THREE.SphereGeometry(
+    1.18,
+    20,
+    12
+  ),
+  bronzeMat
+);
+
+helmetTop.scale.set(1.05, 0.62, 0.95);
+helmet.add(helmetTop);
+
+//
+// HELMET FRONT
+//
+const helmetFront = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    1.7,
+    0.5,
+    0.35
+  ),
+  bronzeMat
+);
+
+helmetFront.position.set(0, -0.15, 0.88);
+helmet.add(helmetFront);
+
+//
+// HELMET CREST
+//
+const crest = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    0.3,
+    0.95,
+    0.8
+  ),
+  redMat
+);
+
+crest.position.set(0, 0.62, 0);
+helmet.add(crest);
+
+//
+// SHOULDERS
+//
+const shoulders = new THREE.Group();
 character.add(shoulders);
 
-const collar = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.18, 12, 32, Math.PI), shirtMat);
-collar.rotation.x = Math.PI / 2;
-collar.position.set(0, 3.35, 1.0);
-character.add(collar);
-
-const chestButtons = [];
-for (let i = 0; i < 4; i++) {
-  const button = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), new THREE.MeshStandardMaterial({ color: 0x3c0d0d }));
-  button.position.set(-0.48 + i * 0.32, 2.25 - i * 0.15, 1.46);
-  chestButtons.push(button);
-  character.add(button);
-}
-
-const leftHandBone = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.8, 4, 10), boneMat);
-leftHandBone.rotation.z = -0.5;
-leftHandBone.position.set(-3.65, -0.6, 0.15);
-character.add(leftHandBone);
-
-const rightHandBone = leftHandBone.clone();
-rightHandBone.position.x = 3.65;
-rightHandBone.rotation.z = 0.5;
-character.add(rightHandBone);
-
-character.position.set(0, 0.4, 0);
-character.rotation.y = Math.PI;
-
-const particleCount = 180;
-const particleGeo = new THREE.BufferGeometry();
-const positions = [];
-for (let i = 0; i < particleCount; i++) {
-  positions.push((Math.random() - 0.5) * 60, Math.random() * 20, (Math.random() - 0.5) * 60);
-}
-particleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-const particles = new THREE.Points(
-  particleGeo,
-  new THREE.PointsMaterial({ color: 0x8a8a8a, size: 0.08, transparent: true, opacity: 0.9 })
+const shoulderGeo = new THREE.SphereGeometry(
+  0.62,
+  16,
+  10
 );
+
+const leftShoulderArmor = new THREE.Mesh(
+  shoulderGeo,
+  bronzeMat
+);
+
+leftShoulderArmor.scale.set(1.15, 0.7, 0.95);
+leftShoulderArmor.position.set(-1.55, 1.25, 0);
+
+const rightShoulderArmor = new THREE.Mesh(
+  shoulderGeo,
+  bronzeMat
+);
+
+rightShoulderArmor.scale.set(1.15, 0.7, 0.95);
+rightShoulderArmor.position.set(1.55, 1.25, 0);
+
+shoulders.add(
+  leftShoulderArmor,
+  rightShoulderArmor
+);
+
+//
+// ARMS
+//
+const leftArm = new THREE.Group();
+const rightArm = new THREE.Group();
+
+leftArm.position.set(-1.55, 1.05, 0);
+rightArm.position.set(1.55, 1.05, 0);
+
+character.add(leftArm, rightArm);
+
+const upperArmGeo = new THREE.CapsuleGeometry(
+  0.34,
+  1.2,
+  6,
+  10
+);
+
+const forearmGeo = new THREE.CapsuleGeometry(
+  0.31,
+  1.1,
+  6,
+  10
+);
+
+const leftUpperArm = new THREE.Mesh(
+  upperArmGeo,
+  redMat
+);
+
+leftUpperArm.position.y = -0.55;
+
+const rightUpperArm = new THREE.Mesh(
+  upperArmGeo,
+  redMat
+);
+
+rightUpperArm.position.y = -0.55;
+
+leftArm.add(leftUpperArm);
+rightArm.add(rightUpperArm);
+
+const leftForearm = new THREE.Mesh(
+  forearmGeo,
+  bronzeMat
+);
+
+leftForearm.position.y = -1.65;
+
+const rightForearm = new THREE.Mesh(
+  forearmGeo,
+  bronzeMat
+);
+
+rightForearm.position.y = -1.65;
+
+leftArm.add(leftForearm);
+rightArm.add(rightForearm);
+
+//
+// HANDS
+//
+const handGeo = new THREE.SphereGeometry(
+  0.32,
+  12,
+  8
+);
+
+const leftHand = new THREE.Mesh(
+  handGeo,
+  skinMat
+);
+
+leftHand.position.y = -2.45;
+
+const rightHand = new THREE.Mesh(
+  handGeo,
+  skinMat
+);
+
+rightHand.position.y = -2.45;
+
+leftArm.add(leftHand);
+rightArm.add(rightHand);
+
+//
+// CLOTH TAIL
+//
+const backCloth = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    1.45,
+    2.0,
+    0.18
+  ),
+  blueMat
+);
+
+backCloth.position.set(
+  0,
+  -0.5,
+  -0.78
+);
+
+character.add(backCloth);
+
+//
+// GROUND
+//
+const ground = new THREE.Mesh(
+  new THREE.CylinderGeometry(
+    5,
+    5,
+    0.25,
+    32
+  ),
+  darkMat
+);
+
+ground.position.y = -5.05;
+scene.add(ground);
+
+//
+// DECORATIVE GROUND RINGS
+//
+for (let i = 0; i < 4; i++) {
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(
+      2.3 + i * 0.7,
+      0.035,
+      8,
+      48
+    ),
+    bronzeMat
+  );
+
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = -4.88;
+  scene.add(ring);
+}
+
+//
+// BACKGROUND PARTICLES
+//
+const particleCount = 120;
+const positions = [];
+
+for (let i = 0; i < particleCount; i++) {
+  positions.push(
+    (Math.random() - 0.5) * 45,
+    Math.random() * 18 - 2,
+    (Math.random() - 0.5) * 45
+  );
+}
+
+const particleGeometry = new THREE.BufferGeometry();
+
+particleGeometry.setAttribute(
+  'position',
+  new THREE.Float32BufferAttribute(
+    positions,
+    3
+  )
+);
+
+const particles = new THREE.Points(
+  particleGeometry,
+  new THREE.PointsMaterial({
+    color: 0xb9965c,
+    size: 0.055,
+    transparent: true,
+    opacity: 0.7
+  })
+);
+
 scene.add(particles);
 
+//
+// ANIMATION
+//
 const clock = new THREE.Clock();
 
 function animate() {
+  requestAnimationFrame(animate);
+
   const t = clock.getElapsedTime();
 
-  camera.position.x = Math.sin(t * 0.55) * 2.6;
-  camera.position.y = 4.6 + Math.sin(t * 0.9) * 0.45;
-  camera.lookAt(0, 1.6, 0);
+  //
+  // Character breathing
+  //
+  character.position.y =
+    Math.sin(t * 2.0) * 0.035;
 
-  character.rotation.y = Math.PI + Math.sin(t * 0.8) * 0.4;
-  character.position.y = 0.2 + Math.sin(t * 1.8) * 0.12;
+  //
+  // Gentle body movement
+  //
+  torso.rotation.z =
+    Math.sin(t * 1.5) * 0.018;
 
-  leftArm.rotation.z = -0.8 + Math.sin(t * 1.8) * 0.12;
-  rightArm.rotation.z = 0.8 - Math.sin(t * 1.8) * 0.12;
+  //
+  // Arms idle animation
+  //
+  leftArm.rotation.z =
+    -0.08 + Math.sin(t * 2.2) * 0.05;
 
-  groundGroup.position.z = (t * 12) % 8;
-  particles.rotation.y = t * 0.06;
+  rightArm.rotation.z =
+    0.08 - Math.sin(t * 2.2) * 0.05;
 
-  renderer.render(scene, camera);
-  requestAnimationFrame(animate);
+  //
+  // Legs subtle movement
+  //
+  leftLeg.rotation.x =
+    Math.sin(t * 1.5) * 0.025;
+
+  rightLeg.rotation.x =
+    -Math.sin(t * 1.5) * 0.025;
+
+  //
+  // Helmet crest movement
+  //
+  crest.rotation.z =
+    Math.sin(t * 2.0) * 0.025;
+
+  //
+  // Floating particles
+  //
+  particles.rotation.y = t * 0.025;
+
+  //
+  // Camera cinematic movement
+  //
+  camera.position.x =
+    Math.sin(t * 0.35) * 2.0;
+
+  camera.position.y =
+    5.0 + Math.sin(t * 0.55) * 0.25;
+
+  camera.position.z = 12;
+
+  camera.lookAt(
+    character.position.x,
+    0,
+    0
+  );
+
+  renderer.render(
+    scene,
+    camera
+  );
 }
 
 animate();
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+//
+// RESIZE
+//
+window.addEventListener(
+  'resize',
+  () => {
+    camera.aspect =
+      window.innerWidth /
+      window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+  }
+);
