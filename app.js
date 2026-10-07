@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+import { GLTFExporter } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/exporters/GLTFExporter.js';
 
 const container = document.getElementById('app');
 
@@ -103,6 +104,7 @@ const pupilMat = new THREE.MeshStandardMaterial({
 // CHARACTER
 //
 const character = new THREE.Group();
+character.name = 'Character';
 scene.add(character);
 
 //
@@ -635,6 +637,61 @@ const particles = new THREE.Points(
 );
 
 scene.add(particles);
+
+//
+// EXPORT TO GLB FUNCTION
+//
+function exportToGLB() {
+  const exporter = new GLTFExporter();
+  
+  exporter.parse(
+    character,
+    function(result) {
+      saveArrayBuffer(result, 'warrior-character.glb');
+    },
+    { binary: true }
+  );
+}
+
+function saveArrayBuffer(buffer, filename) {
+  const blob = new Blob([buffer], { type: 'application/octet-stream' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
+
+// Add export button to the page
+const exportBtn = document.createElement('button');
+exportBtn.textContent = '📥 Export GLB';
+exportBtn.style.cssText = `
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 20px;
+  background: rgba(20, 20, 20, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  backdrop-filter: blur(6px);
+  z-index: 10;
+  transition: all 0.3s ease;
+`;
+
+exportBtn.onmouseover = () => {
+  exportBtn.style.background = 'rgba(40, 40, 40, 0.9)';
+  exportBtn.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+};
+
+exportBtn.onmouseout = () => {
+  exportBtn.style.background = 'rgba(20, 20, 20, 0.7)';
+  exportBtn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+};
+
+exportBtn.onclick = exportToGLB;
+document.body.appendChild(exportBtn);
 
 //
 // ANIMATION
